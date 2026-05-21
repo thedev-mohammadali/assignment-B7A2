@@ -1,0 +1,68 @@
+import type {
+  ErrorRequestHandler,
+  NextFunction,
+  Request,
+  Response,
+} from "express";
+import { sendResponse } from "../utils/sendResponse";
+
+export const globalErrorHandler: ErrorRequestHandler = (
+  error: unknown,
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  //Handle Signup Errors
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    "detail" in error
+  ) {
+    switch (error.code) {
+      case "23505":
+        return sendResponse(res, 409, {
+          success: false,
+          message: "User already exists with this email",
+          errors:
+            typeof error.detail === "string"
+              ? error.detail
+              : "Duplicate email!",
+        });
+      case "23514":
+        return sendResponse(res, 400, {
+          success: false,
+          message: "Role can either be contributor or maintainer!",
+          errors:
+            typeof error.detail === "string"
+              ? error.detail
+              : "Check constraints failed!",
+        });
+      case "23502":
+        return sendResponse(res, 400, {
+          success: false,
+          message: "Required field is missing",
+          errors:
+            typeof error.detail === "string"
+              ? error.detail
+              : "Not null constraint failed",
+        });
+    }
+  }
+  //Handle Login Errors
+  if (error instanceof Error) {
+    if (error.message === "Invalid Credentials!") {
+      return sendResponse(res, 401, {
+        success: false,
+        message: error.message,
+        errors: "Invalid email or password",
+      });
+    }
+  }
+
+  return sendResponse(res, 500, {
+    success: false,
+    message: "Something went wrong",
+    errors: "Internal Server Error",
+  });
+};
