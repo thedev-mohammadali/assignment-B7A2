@@ -1,16 +1,57 @@
 import type { NextFunction, Request, Response } from "express";
+import { sendResponse } from "../../utils/sendResponse";
+import type { IIssuePayload, IIssueQuery } from "./issue.interface";
+import { issueService } from "./issue.service";
+
+const {
+  createIssueIntoDB,
+  deleteIssueFromDB,
+  getAllIssuesFromDB,
+  getSingleIssueFromDB,
+  updateIssueIntoDB,
+} = issueService;
 
 const createIssue = async (
-  req: Request,
+  req: Request<{}, {}, IIssuePayload>,
   res: Response,
   next: NextFunction,
-) => {};
+) => {
+  try {
+    const reporterId = req.user?.id;
+
+    if (!reporterId) {
+      throw new Error("User information is missing");
+    }
+
+    const result = await createIssueIntoDB(req.body, reporterId);
+
+    sendResponse(res, 201, {
+      success: true,
+      message: "Issue created successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 const getAllIssues = async (
-  req: Request,
+  req: Request<{}, {}, {}, IIssueQuery>,
   res: Response,
   next: NextFunction,
-) => {};
+) => {
+  try {
+    const result = await getAllIssuesFromDB(req.query);
+    sendResponse(res, 200, {
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    // next(error);
+    console.log(error);
+  }
+};
+
 const getSingleIssue = async (
   req: Request,
   res: Response,

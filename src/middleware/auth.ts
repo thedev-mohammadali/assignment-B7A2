@@ -19,13 +19,16 @@ export const auth = (...roles: Role[]) => {
 
       const decoded = jwt.verify(token, config.secret) as IJwtPayload;
 
-      if (!roles.includes(decoded.role)) {
+      if (roles.length && !roles.includes(decoded.role)) {
         return sendResponse(res, 403, {
           success: false,
-          message: "Access Frobidden!",
+          message: "Access Forbidden!",
           errors: "Access is not available for the role",
         });
       }
+
+      req.user = decoded;
+
       next();
     } catch (error) {
       console.log(error);

@@ -32,7 +32,7 @@ export const globalErrorHandler: ErrorRequestHandler = (
       case "23514":
         return sendResponse(res, 400, {
           success: false,
-          message: "Role can either be contributor or maintainer!",
+          message: "Constraint did not match",
           errors:
             typeof error.detail === "string"
               ? error.detail
@@ -57,6 +57,22 @@ export const globalErrorHandler: ErrorRequestHandler = (
         message: error.message,
         errors: "Invalid email or password",
       });
+    }
+
+    switch (error.message) {
+      case "Invalid Credentials!":
+        return sendResponse(res, 401, {
+          success: false,
+          message: error.message,
+          errors: "Invalid email or password",
+        });
+
+      case "User information is missing":
+        return sendResponse(res, 401, {
+          success: false,
+          message: "Unauthorized access",
+          errors: "User information is missing",
+        });
     }
   }
 
