@@ -1,5 +1,5 @@
 import { pool } from "../../db";
-import type { IIssuePayload, IIssueQuery } from "./issue.interface";
+import type { IIssue, IIssuePayload, IIssueQuery } from "./issue.interface";
 
 const createIssueIntoDB = async (
   payload: IIssuePayload,
@@ -55,8 +55,8 @@ const getAllIssuesFromDB = async (queryParams: IIssueQuery) => {
   //check if there are any issues or not
   if (issues.length > 0) {
     //get all the reporter ids
-    const reporterIds = issues.map((issue) => issue.reporter_id);
-    const condition = reporterIds.map((_, i) => `$${i + 1}`).join(", ");
+    const reporterIds = [...new Set(issues.map((issue) => issue.reporter_id))];
+    const condition = reporterIds.map((_, i) => `$${i + 1}`).join(", "); // '$1, $2, $3, ...'
     const reportersData = await pool.query(
       `
         SELECT id, name, email 
@@ -66,11 +66,29 @@ const getAllIssuesFromDB = async (queryParams: IIssueQuery) => {
       reporterIds,
     );
 
-    const reports = reportersData.rows;
-    console.log(reports);
+    const reporters = reportersData.rows;
+
+    const reporterMap = new Map(
+      reporters.map((reporter) => [reporter.id, reporter]),
+    );
+
+    const formattedIssues = issues.map((issue: IIssue) => {
+      return {
+        id: issue.id,
+        title: issue.title,
+        description: issue.description,
+        type: issue.type,
+        status: issue.status,
+        reporter: reporterMap.get(issue.reporter_id),
+        created_at: issue.created_at,
+        updated_at: issue.updated_at,
+      };
+    });
+
+    return formattedIssues;
   }
 
-  return issues;
+  return [];
 };
 
 const getSingleIssueFromDB = async () => {};
