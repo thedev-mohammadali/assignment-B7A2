@@ -1,5 +1,5 @@
 import { type Request, type Response } from "express";
-import type { ISignupPayload } from "./auth.interface";
+import type { ILoginPayload, ISignupPayload } from "./auth.interface";
 import { authService } from "./auth.service";
 
 const signup = async (req: Request<{}, {}, ISignupPayload>, res: Response) => {
@@ -48,6 +48,32 @@ const signup = async (req: Request<{}, {}, ISignupPayload>, res: Response) => {
   }
 };
 
+const login = async (req: Request<{}, {}, ILoginPayload>, res: Response) => {
+  try {
+    const result = await authService.loginService(req.body);
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      data: result,
+    });
+  } catch (error) {
+    if (error instanceof Error && error.message === "Invalid Credentials!") {
+      return res.status(401).json({
+        success: false,
+        message: error.message,
+        errors: "Invalid email or password",
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+      errors: "Internal server error",
+    });
+  }
+};
+
 export const authController = {
   signup,
+  login,
 };
