@@ -1,3 +1,5 @@
+import type { JwtPayload } from "jsonwebtoken";
+
 export const Roles = {
   CONTRIBUTOR: "contributor",
   MAINTAINER: "maintainer",
@@ -10,4 +12,10 @@ export interface IResponse<T> {
   message: string;
   data?: T;
   errors?: string;
+}
+
+export interface IJwtPayload extends JwtPayload {
+  id: number;
+  name: string;
+  role: Role;
 }
