@@ -1,9 +1,10 @@
 import express, { type Application } from "express";
+import { authRoute } from "./modules/auth/auth.route";
 
 const app: Application = express();
 
-app.get("/", (req, res) => {
-  res.send("hello");
-});
+app.use(express.json());
+
+app.use("/api/auth", authRoute);
 
 export default app;
