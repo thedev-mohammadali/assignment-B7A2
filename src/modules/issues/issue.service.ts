@@ -1,5 +1,6 @@
 import { pool } from "../../db";
-import type { IIssue, IIssuePayload, IIssueQuery } from "./issue.interface";
+import type { IIssuePayload, IIssueQuery } from "./issue.interface";
+import { issueWithReporter } from "./issue.utils";
 
 const createIssueIntoDB = async (
   payload: IIssuePayload,
@@ -53,45 +54,66 @@ const getAllIssuesFromDB = async (queryParams: IIssueQuery) => {
   const issues = result.rows;
 
   //check if there are any issues or not
-  if (issues.length > 0) {
-    //get all the reporter ids
-    const reporterIds = [...new Set(issues.map((issue) => issue.reporter_id))];
-    const condition = reporterIds.map((_, i) => `$${i + 1}`).join(", "); // '$1, $2, $3, ...'
-    const reportersData = await pool.query(
-      `
-        SELECT id, name, email 
-        FROM users
-        WHERE id IN (${condition})
-        `,
-      reporterIds,
-    );
+  //   if (issues.length > 0) {
+  //     //get all the reporter ids
+  //     const reporterIds = [...new Set(issues.map((issue) => issue.reporter_id))];
+  //     const condition = reporterIds.map((_, i) => `$${i + 1}`).join(", "); // '$1, $2, $3, ...'
+  //     const reportersData = await pool.query(
+  //       `
+  //         SELECT id, name, email
+  //         FROM users
+  //         WHERE id IN (${condition})
+  //         `,
+  //       reporterIds,
+  //     );
 
-    const reporters = reportersData.rows;
+  //     const reporters = reportersData.rows;
 
-    const reporterMap = new Map(
-      reporters.map((reporter) => [reporter.id, reporter]),
-    );
+  //     const reporterMap = new Map(
+  //       reporters.map((reporter) => [reporter.id, reporter]),
+  //     );
 
-    const formattedIssues = issues.map((issue: IIssue) => {
-      return {
-        id: issue.id,
-        title: issue.title,
-        description: issue.description,
-        type: issue.type,
-        status: issue.status,
-        reporter: reporterMap.get(issue.reporter_id),
-        created_at: issue.created_at,
-        updated_at: issue.updated_at,
-      };
-    });
+  //     const formattedIssues = issues.map((issue: IIssue) => {
+  //       return {
+  //         id: issue.id,
+  //         title: issue.title,
+  //         description: issue.description,
+  //         type: issue.type,
+  //         status: issue.status,
+  //         reporter: reporterMap.get(issue.reporter_id),
+  //         created_at: issue.created_at,
+  //         updated_at: issue.updated_at,
+  //       };
+  //     });
 
-    return formattedIssues;
-  }
-
-  return [];
+  //     return formattedIssues;
+  //   }
+  return issueWithReporter(issues);
 };
 
-const getSingleIssueFromDB = async () => {};
+const getSingleIssueFromDB = async (id: number) => {
+  const issueData = await pool.query(
+    `
+        SELECT * FROM issues
+        WHERE id = $1
+        `,
+    [id],
+  );
+
+  if (issueData.rowCount === 0) {
+    throw new Error("No issues found");
+  }
+
+  const formattedIssue = await issueWithReporter(issueData.rows);
+
+  const issue = formattedIssue[0];
+
+  if (!issue) {
+    throw new Error("No issues found");
+  }
+
+  return issue;
+};
 
 const updateIssueIntoDB = async () => {};
 

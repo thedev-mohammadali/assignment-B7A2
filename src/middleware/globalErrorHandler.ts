@@ -51,14 +51,6 @@ export const globalErrorHandler: ErrorRequestHandler = (
   }
   //Handle Login Errors
   if (error instanceof Error) {
-    if (error.message === "Invalid Credentials!") {
-      return sendResponse(res, 401, {
-        success: false,
-        message: error.message,
-        errors: "Invalid email or password",
-      });
-    }
-
     switch (error.message) {
       case "Invalid Credentials!":
         return sendResponse(res, 401, {
@@ -72,6 +64,13 @@ export const globalErrorHandler: ErrorRequestHandler = (
           success: false,
           message: "Unauthorized access",
           errors: "User information is missing",
+        });
+
+      case "No issues found":
+        return sendResponse(res, 404, {
+          success: false,
+          message: error.message,
+          errors: "The id didn't match any issue id",
         });
     }
   }

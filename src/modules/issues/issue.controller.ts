@@ -47,16 +47,27 @@ const getAllIssues = async (
       data: result,
     });
   } catch (error) {
-    // next(error);
-    console.log(error);
+    next(error);
   }
 };
 
 const getSingleIssue = async (
-  req: Request,
+  req: Request<{ id: string }>,
   res: Response,
   next: NextFunction,
-) => {};
+) => {
+  try {
+    const id = Number(req.params.id);
+    const result = await getSingleIssueFromDB(id);
+    sendResponse(res, 200, {
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const updateIssue = async (
   req: Request,
   res: Response,
