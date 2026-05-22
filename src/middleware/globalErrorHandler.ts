@@ -86,6 +86,13 @@ export const globalErrorHandler: ErrorRequestHandler = (
           message: error.message,
           errors: "At least one field is needed to update",
         });
+
+      case "Cannot update issue!":
+        return sendResponse(res, 400, {
+          success: false,
+          message: error.message,
+          errors: "Issue status is not open",
+        });
     }
   }
 

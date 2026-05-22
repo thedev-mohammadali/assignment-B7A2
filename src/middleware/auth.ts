@@ -35,6 +35,9 @@ export const auth = (...roles: Role[]) => {
         if (decoded.role === "contributor" && decoded.id !== reporterId) {
           throw new Error("Access not allowed");
         }
+        if (decoded.role === "contributor" && issueToUpdate.status !== "open") {
+          throw new Error("Cannot update issue!");
+        }
       }
 
       req.user = decoded;
