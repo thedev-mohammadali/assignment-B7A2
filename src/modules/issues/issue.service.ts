@@ -1,6 +1,6 @@
 import { pool } from "../../db";
 import type { IIssuePayload, IIssueQuery } from "./issue.interface";
-import { issueWithReporter } from "./issue.utils";
+import { addConditon, issueWithReporter } from "./issue.utils";
 
 const createIssueIntoDB = async (
   payload: IIssuePayload,
@@ -33,15 +33,8 @@ const getAllIssuesFromDB = async (queryParams: IIssueQuery) => {
   //If sort doesn't exist then default to Descending order
   const sortParam = sort === "oldest" ? "ASC" : "DESC";
 
-  if (status) {
-    values.push(status);
-    conditions.push(`status = $${values.length}`);
-  }
-
-  if (type) {
-    values.push(type);
-    conditions.push(`type = $${values.length}`);
-  }
+  if (status) addConditon("status", status, conditions, values);
+  if (type) addConditon("type", type, conditions, values);
 
   if (conditions.length > 0) {
     sql += ` WHERE ${conditions.join(" AND ")}`;
@@ -80,7 +73,32 @@ const getSingleIssueFromDB = async (id: number) => {
   return issue;
 };
 
-const updateIssueIntoDB = async () => {};
+const updateIssueIntoDB = async (
+  payload: Partial<IIssuePayload>,
+  id: number,
+) => {
+  const { title, description, type } = payload;
+
+  if (!title && !description && !type) {
+    throw new Error("No data provided for update!");
+  }
+
+  const result = await pool.query(
+    `
+    UPDATE issues
+    SET
+    title = COALESCE($1, title),
+    description = COALESCE($2, description),
+    type = COALESCE($3, type)
+
+    WHERE id = $4
+    RETURNING *
+    `,
+    [title, description, type, id],
+  );
+
+  return result;
+};
 
 const deleteIssueFromDB = async () => {};
 

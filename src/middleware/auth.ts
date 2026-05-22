@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import config from "../config";
+import { issueService } from "../modules/issues/issue.service";
 import type { IJwtPayload, Role } from "../types";
 import { sendResponse } from "../utils/sendResponse";
 
@@ -27,11 +28,20 @@ export const auth = (...roles: Role[]) => {
         });
       }
 
+      if (req.method === "PATCH") {
+        const id = Number(req.params.id);
+        const issueToUpdate = await issueService.getSingleIssueFromDB(id);
+        const reporterId = issueToUpdate.reporter.id;
+        if (decoded.role === "contributor" && decoded.id !== reporterId) {
+          throw new Error("Access not allowed");
+        }
+      }
+
       req.user = decoded;
 
       next();
     } catch (error) {
-      console.log(error);
+      next(error);
     }
   };
 };

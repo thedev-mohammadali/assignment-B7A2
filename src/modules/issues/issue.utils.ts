@@ -1,5 +1,5 @@
 import { pool } from "../../db";
-import type { IIssue } from "./issue.interface";
+import type { IIssue, IReporter } from "./issue.interface";
 
 export const issueWithReporter = async (issues: IIssue[]) => {
   if (issues.length === 0) {
@@ -30,11 +30,24 @@ export const issueWithReporter = async (issues: IIssue[]) => {
       description: issue.description,
       type: issue.type,
       status: issue.status,
-      reporter: reporterMap.get(issue.reporter_id),
+      reporter: reporterMap.get(issue.reporter_id) as IReporter,
       created_at: issue.created_at,
       updated_at: issue.updated_at,
     };
   });
 
   return formattedIssues;
+};
+
+//utility function for adding conditions to use in sql
+export const addConditon = (
+  field: string,
+  value: string,
+  conditions: string[],
+  values: string[],
+) => {
+  if (value) {
+    values.push(value);
+    conditions.push(`${field} = $${values.length}`);
+  }
 };

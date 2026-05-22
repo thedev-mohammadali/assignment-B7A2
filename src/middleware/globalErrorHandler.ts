@@ -66,11 +66,25 @@ export const globalErrorHandler: ErrorRequestHandler = (
           errors: "User information is missing",
         });
 
+      case "Access not allowed":
+        return sendResponse(res, 403, {
+          success: false,
+          message: error.message,
+          errors: "User is not allowed to do the operation",
+        });
+
       case "No issues found":
         return sendResponse(res, 404, {
           success: false,
           message: error.message,
           errors: "The id didn't match any issue id",
+        });
+
+      case "No data provided for update!":
+        return sendResponse(res, 400, {
+          success: false,
+          message: error.message,
+          errors: "At least one field is needed to update",
         });
     }
   }

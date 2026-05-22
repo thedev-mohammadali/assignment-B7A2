@@ -1,11 +1,13 @@
-export interface IIssuePayload {
-  title: string;
-  description: string;
-  type: string;
-}
+import type { Role } from "../../types";
 
 export type IssueType = "bug" | "feature_request";
 export type IssueStatus = "open" | "in_progress" | "resolved";
+
+export interface IIssuePayload {
+  title: string;
+  description: string;
+  type: IssueType;
+}
 
 export interface IIssueQuery {
   sort?: "newest" | "oldest";
@@ -22,4 +24,10 @@ export interface IIssue {
   reporter_id: number;
   created_at: Date;
   updated_at: Date;
+}
+
+export interface IReporter {
+  id: number;
+  name: string;
+  role: Role;
 }

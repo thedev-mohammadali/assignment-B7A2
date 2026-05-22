@@ -69,10 +69,23 @@ const getSingleIssue = async (
 };
 
 const updateIssue = async (
-  req: Request,
+  req: Request<{ id: string }, {}, Partial<IIssuePayload>>,
   res: Response,
   next: NextFunction,
-) => {};
+) => {
+  try {
+    const id = Number(req.params.id);
+    const result = await updateIssueIntoDB(req.body, id);
+    sendResponse(res, 200, {
+      success: true,
+      message: "Issue Updated successfully",
+      data: result.rows[0],
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const deleteIssue = async (
   req: Request,
   res: Response,
