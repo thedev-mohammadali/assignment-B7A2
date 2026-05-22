@@ -100,7 +100,19 @@ const updateIssueIntoDB = async (
   return result;
 };
 
-const deleteIssueFromDB = async () => {};
+const deleteIssueFromDB = async (id: number) => {
+  //First check if any issue exist with the given ID
+  await getSingleIssueFromDB(id);
+
+  //Delete the issue with the given id
+  await pool.query(
+    `
+    DELETE FROM issues
+    WHERE id = $1
+    `,
+    [id],
+  );
+};
 
 export const issueService = {
   createIssueIntoDB,

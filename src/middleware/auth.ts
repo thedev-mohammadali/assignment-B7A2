@@ -40,6 +40,9 @@ export const auth = (...roles: Role[]) => {
         }
       }
 
+      if (req.method === "DELETE" && decoded.role !== "maintainer")
+        throw new Error("Access not allowed");
+
       req.user = decoded;
 
       next();

@@ -12,6 +12,6 @@ router.post("/", auth(Roles.CONTRIBUTOR, Roles.MAINTAINER), createIssue);
 router.get("/", getAllIssues);
 router.get("/:id", getSingleIssue);
 router.patch("/:id", auth(Roles.CONTRIBUTOR, Roles.MAINTAINER), updateIssue);
-router.delete("/:id", deleteIssue);
+router.delete("/:id", auth(Roles.MAINTAINER), deleteIssue);
 
 export const issueRoute = router;
