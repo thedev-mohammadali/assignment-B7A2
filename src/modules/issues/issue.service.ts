@@ -53,41 +53,6 @@ const getAllIssuesFromDB = async (queryParams: IIssueQuery) => {
 
   const issues = result.rows;
 
-  //check if there are any issues or not
-  //   if (issues.length > 0) {
-  //     //get all the reporter ids
-  //     const reporterIds = [...new Set(issues.map((issue) => issue.reporter_id))];
-  //     const condition = reporterIds.map((_, i) => `$${i + 1}`).join(", "); // '$1, $2, $3, ...'
-  //     const reportersData = await pool.query(
-  //       `
-  //         SELECT id, name, email
-  //         FROM users
-  //         WHERE id IN (${condition})
-  //         `,
-  //       reporterIds,
-  //     );
-
-  //     const reporters = reportersData.rows;
-
-  //     const reporterMap = new Map(
-  //       reporters.map((reporter) => [reporter.id, reporter]),
-  //     );
-
-  //     const formattedIssues = issues.map((issue: IIssue) => {
-  //       return {
-  //         id: issue.id,
-  //         title: issue.title,
-  //         description: issue.description,
-  //         type: issue.type,
-  //         status: issue.status,
-  //         reporter: reporterMap.get(issue.reporter_id),
-  //         created_at: issue.created_at,
-  //         updated_at: issue.updated_at,
-  //       };
-  //     });
-
-  //     return formattedIssues;
-  //   }
   return issueWithReporter(issues);
 };
 
