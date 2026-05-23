@@ -99,6 +99,6 @@ export const globalErrorHandler: ErrorRequestHandler = (
   return sendResponse(res, 500, {
     success: false,
     message: "Something went wrong",
-    errors: "Internal Server Error",
+    errors: error instanceof Error ? error.message : "Internal server error!",
   });
 };
