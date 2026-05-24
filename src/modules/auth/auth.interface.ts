@@ -4,7 +4,7 @@ export interface ISignupPayload {
   name: string;
   email: string;
   password: string;
-  role: Role;
+  role?: Role;
 }
 
 export interface ILoginPayload {

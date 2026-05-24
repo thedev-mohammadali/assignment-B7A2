@@ -89,13 +89,17 @@ const updateIssueIntoDB = async (
     SET
     title = COALESCE($1, title),
     description = COALESCE($2, description),
-    type = COALESCE($3, type)
-
+    type = COALESCE($3, type),
+    updated_at = NOW()
     WHERE id = $4
     RETURNING *
     `,
     [title, description, type, id],
   );
+
+  if (result.rowCount === 0) {
+    throw new Error("No issues found");
+  }
 
   return result;
 };

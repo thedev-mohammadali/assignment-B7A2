@@ -78,7 +78,7 @@ const updateIssue = async (
     const result = await updateIssueIntoDB(req.body, id);
     sendResponse(res, 200, {
       success: true,
-      message: "Issue Updated successfully",
+      message: "Issue updated successfully",
       data: result.rows[0],
     });
   } catch (error) {
@@ -93,7 +93,7 @@ const deleteIssue = async (
 ) => {
   try {
     const id = Number(req.params.id);
-    const result = await deleteIssueFromDB(id);
+    await deleteIssueFromDB(id);
     sendResponse(res, 200, {
       success: true,
       message: "Issue deleted successfully",
