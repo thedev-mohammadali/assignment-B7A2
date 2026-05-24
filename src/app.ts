@@ -1,3 +1,4 @@
+import cors from "cors";
 import express, { type Application } from "express";
 import { globalErrorHandler } from "./middleware/globalErrorHandler";
 import { authRoute } from "./modules/auth/auth.route";
@@ -6,6 +7,7 @@ import { sendResponse } from "./utils/sendResponse";
 
 const app: Application = express();
 
+app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
